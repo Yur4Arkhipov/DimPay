@@ -19,7 +19,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,15 +35,21 @@ fun BankCardItem(
     card: BankCardUi,
     modifier: Modifier = Modifier
 ) {
-    val gradient = remember(card.gradientColors) {
-        Brush.linearGradient(card.gradientColors)
-    }
+    val cardGradient = Brush.verticalGradient(
+        colors = listOf(
+            Color(0xFFD4D4FC),
+            Color.White
+        )
+    )
 
     Card(
         modifier = modifier
             .fillMaxWidth()
             .height(140.dp),
         shape = RoundedCornerShape(32.dp),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 8.dp
+        ),
         colors = CardDefaults.cardColors(
             containerColor = Color.Transparent
         )
@@ -52,7 +57,7 @@ fun BankCardItem(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(gradient)
+                .background(cardGradient)
                 .padding(24.dp)
         ) {
             Column(
@@ -64,14 +69,14 @@ fun BankCardItem(
                     Box(
                         modifier = Modifier
                             .size(40.dp)
-                            .clip(RoundedCornerShape(18.dp))
-                            .background(Color.White.copy(alpha = 0.15f)),
+                            .clip(RoundedCornerShape(14.dp))
+                            .background(Color(0xFFF3F4F6)),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.ic_home_outlined),
                             contentDescription = null,
-                            tint = Color.White,
+                            tint = Color(0xFF5B3FD8),
                             modifier = Modifier.size(24.dp)
                         )
                     }
@@ -84,7 +89,7 @@ fun BankCardItem(
                             style = MaterialTheme.typography.titleLarge.copy(
                                 fontWeight = FontWeight.Bold
                             ),
-                            color = Color.White
+                            color = Color(0xFF1A1A3A)
                         )
 
                         Spacer(modifier = Modifier.height(4.dp))
@@ -92,7 +97,7 @@ fun BankCardItem(
                         Text(
                             text = card.cardType,
                             style = MaterialTheme.typography.bodyMedium,
-                            color = Color.White.copy(alpha = 0.75f)
+                            color = Color(0xFF7A7A99)
                         )
                     }
                 }
@@ -107,7 +112,7 @@ fun BankCardItem(
                     Text(
                         text = "•••• ${card.lastNumbers}",
                         style = MaterialTheme.typography.titleMedium,
-                        color = Color.White.copy(alpha = 0.85f)
+                        color = Color(0xFF1A1A3A)
                     )
                 }
             }
