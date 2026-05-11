@@ -18,26 +18,46 @@ class AddCardViewModel @Inject constructor(
     val uiState = _uiState.asStateFlow()
 
     fun onCardNameChange(value: String) {
-        _uiState.update {
-            it.copy(cardName = value)
+        val formatted = value.replace("\n", "")
+        if (formatted.length <= 20) {
+            _uiState.update {
+                it.copy(cardName = formatted)
+            }
         }
     }
 
     fun onCardNumberChange(value: String) {
-        _uiState.update {
-            it.copy(cardNumber = value)
+        val digitsOnly = value.filter { it.isDigit() }
+        if (digitsOnly.length <= 16) {
+            _uiState.update {
+                it.copy(cardNumber = digitsOnly)
+            }
         }
     }
 
     fun onExpireDateChange(value: String) {
-        _uiState.update {
-            it.copy(expireDate = value)
+        val digitsOnly = value.filter { it.isDigit() }
+        if (digitsOnly.length <= 4) {
+            _uiState.update {
+                it.copy(expireDate = digitsOnly)
+            }
         }
     }
 
     fun onCvvChange(value: String) {
+        val digitsOnly = value.filter { it.isDigit() }
+        if (digitsOnly.length <= 3) {
+            _uiState.update {
+                it.copy(cvv = digitsOnly)
+            }
+        }
+    }
+
+    fun toggleCvvVisibility() {
         _uiState.update {
-            it.copy(cvv = value)
+            it.copy(
+                isCvvVisible = !it.isCvvVisible
+            )
         }
     }
 }

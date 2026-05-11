@@ -4,5 +4,6 @@ data class AddCardUi(
     val cardName: String = "",
     val cardNumber: String = "",
     val expireDate: String = "",
-    val cvv: String = ""
+    val cvv: String = "",
+    val isCvvVisible: Boolean = false
 )
