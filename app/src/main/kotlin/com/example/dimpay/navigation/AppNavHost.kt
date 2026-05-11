@@ -3,6 +3,7 @@ package com.example.dimpay.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
+import com.example.dimpay.feature.history.navigation.historySection
 import com.example.dimpay.feature.home.navigation.HomeBaseRoute
 import com.example.dimpay.feature.home.navigation.homeSection
 import com.example.dimpay.mainapp.AppState
@@ -23,5 +24,7 @@ fun AppNavHost(
 
 //            onBackClick = navController::popBackStack
         )
+
+        historySection()
     }
 }

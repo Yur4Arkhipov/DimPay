@@ -12,6 +12,7 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
+import com.example.dimpay.feature.history.navigation.navigateToHistory
 import com.example.dimpay.feature.home.navigation.navigateToHome
 import com.example.dimpay.navigation.TopLevelDestination
 import kotlinx.coroutines.CoroutineScope
@@ -71,8 +72,7 @@ class AppState(
 
             when (topLevelDestination) {
                 TopLevelDestination.HOME -> navController.navigateToHome(topLevelNavOptions)
-//                TopLevelDestination.STATISTICS -> navController.navigateToStatistics(topLevelNavOptions)
-//                TopLevelDestination.PROFILE -> navController.navigateToProfile(topLevelNavOptions)
+                TopLevelDestination.HISTORY -> navController.navigateToHistory(topLevelNavOptions)
             }
         }
     }
