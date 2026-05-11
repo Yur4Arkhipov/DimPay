@@ -6,6 +6,7 @@ import androidx.navigation.compose.NavHost
 import com.example.dimpay.feature.history.navigation.historySection
 import com.example.dimpay.feature.home.navigation.HomeBaseRoute
 import com.example.dimpay.feature.home.navigation.homeSection
+import com.example.dimpay.feature.home.navigation.navigateToAddCard
 import com.example.dimpay.mainapp.AppState
 
 @Composable
@@ -21,8 +22,10 @@ fun AppNavHost(
         modifier = modifier
     ) {
         homeSection(
-
-//            onBackClick = navController::popBackStack
+            onNavigateToAddCard = {
+                navController.navigateToAddCard()
+            },
+            onBackClick = navController::popBackStack
         )
 
         historySection()

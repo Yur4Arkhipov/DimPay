@@ -1,4 +1,4 @@
-package com.example.dimpay.feature.home
+package com.example.dimpay.feature.home.ui.home
 
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
@@ -15,9 +15,8 @@ class HomeViewModel @Inject constructor() : ViewModel() {
         listOf(
             BankCardUi(
                 id = 1,
-                bankName = "Тинькофф",
+                cardName = "Тинькофф",
                 cardType = "Дебетовая карта",
-                balance = "32 540 ₽",
                 lastNumbers = "1234",
 //                icon = AppIcons.Home,
                 gradientColors = listOf(
@@ -27,9 +26,8 @@ class HomeViewModel @Inject constructor() : ViewModel() {
             ),
             BankCardUi(
                 id = 2,
-                bankName = "Сбербанк",
+                cardName = "Сбербанк",
                 cardType = "Дебетовая карта",
-                balance = "74 320 ₽",
                 lastNumbers = "9101",
 //                icon = Icons.Default.CheckCircle,
                 gradientColors = listOf(
@@ -39,9 +37,8 @@ class HomeViewModel @Inject constructor() : ViewModel() {
             ),
             BankCardUi(
                 id = 3,
-                bankName = "Альфа-Банк",
+                cardName = "Альфа-Банк",
                 cardType = "Кредитная карта",
-                balance = "56 000 ₽",
                 lastNumbers = "3456",
 //                icon = Icons.Default.Favorite,
                 gradientColors = listOf(
