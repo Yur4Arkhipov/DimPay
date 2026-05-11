@@ -24,4 +24,6 @@ dependencyResolutionManagement {
 
 rootProject.name = "DimPay"
 include(":app")
- 
+include(":core")
+include(":core:designsystem")
+include(":core:security")
