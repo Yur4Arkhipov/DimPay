@@ -19,6 +19,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.dimpay.core.designsystem.R
+import com.example.dimpay.mainapp.MainApp
 
 @Composable
 fun AuthGateScreen(
@@ -32,7 +33,7 @@ fun AuthGateScreen(
             LaunchedEffect(Unit) { onAuthenticate() }
         }
         is AuthGateState.Authenticating -> { }/*LoadingIndicator()*/
-        is AuthGateState.Authenticated -> MainAppContent()
+        is AuthGateState.Authenticated -> MainApp()
 
         is AuthGateState.SetupRequired -> {
             SecuritySetupScreen(onSetupClick = onSetupSecurity)
@@ -74,17 +75,6 @@ fun SecuritySetupScreen(onSetupClick: () -> Unit) {
         Button(onClick = onSetupClick) {
             Text("Открыть настройки")
         }
-    }
-}
-
-@Composable
-fun MainAppContent() {
-    Column(
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxSize()
-    ) {
-        Text("Главный экран")
     }
 }
 
