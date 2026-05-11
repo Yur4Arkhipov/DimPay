@@ -28,24 +28,24 @@ class MainActivity : FragmentActivity() {
             DimPayTheme {
                 val state by viewModel.uiState.collectAsState()
 
-//                AuthGateScreen(
-//                    state = state,
-//                    onAuthenticate = { viewModel.authenticate(this) },
-//                    onSetupSecurity = {
-//                        val intent = Intent(Settings.ACTION_SECURITY_SETTINGS)
-//                        startActivity(intent)
-//                    }
-//                )
+                AuthGateScreen(
+                    state = state,
+                    onAuthenticate = { viewModel.authenticate(this) },
+                    onSetupSecurity = {
+                        val intent = Intent(Settings.ACTION_SECURITY_SETTINGS)
+                        startActivity(intent)
+                    }
+                )
 
-                val appState = rememberAppState()
-                App(appState = appState)
+//                val appState = rememberAppState()
+//                App(appState = appState)
             }
         }
     }
 
     override fun onStart() {
         super.onStart()
-        viewModel.checkAuth()
+        viewModel.start()
     }
 
     override fun onStop() {

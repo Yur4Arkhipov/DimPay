@@ -1,5 +1,6 @@
 package com.example.dimpay.auth
 
+import android.util.Log
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -9,6 +10,7 @@ import com.example.dimpay.core.domain.auth.BiometricLockoutException
 import com.example.dimpay.core.domain.auth.BiometricUserCanceledException
 import com.example.dimpay.core.domain.auth.NoDeviceCredentialException
 import com.example.dimpay.core.domain.auth.SessionManager
+import com.example.dimpay.core.domain.repository.AppInstanceRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,17 +20,30 @@ import javax.inject.Inject
 @HiltViewModel
 class AuthGateViewModel @Inject constructor(
     private val sessionManager: SessionManager,
-    private val biometricAuthenticator: BiometricAuthenticator
+    private val biometricAuthenticator: BiometricAuthenticator,
+    private val appInstanceRepository: AppInstanceRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<AuthGateState>(AuthGateState.Checking)
     val uiState: StateFlow<AuthGateState> = _uiState
 
-    fun checkAuth() {
-        _uiState.value = if (sessionManager.isAuthenticated()) {
-            AuthGateState.Authenticated
-        } else {
-            AuthGateState.RequireAuth
+    fun start() {
+        viewModelScope.launch {
+            _uiState.value = AuthGateState.Checking
+            _uiState.value = AuthGateState.CheckingAppInstance
+            val appTokenResult = runCatching {
+                appInstanceRepository.getOrFetchToken()
+            }
+            Log.d("AuthGateVM", "Token result: $appTokenResult")
+            if (appTokenResult.isFailure) {
+                _uiState.value = AuthGateState.Error("Нет соединения с сервером")
+                return@launch
+            }
+            if (!sessionManager.isAuthenticated()) {
+                _uiState.value = AuthGateState.RequireAuth
+                return@launch
+            }
+            _uiState.value = AuthGateState.Authenticated
         }
     }
 
@@ -41,15 +56,12 @@ class AuthGateViewModel @Inject constructor(
                     handleAuthResult(result)
                 }
             }
-
             is BiometricAuthStatus.NotEnrolled -> {
                 _uiState.value = AuthGateState.SetupRequired
             }
-
             is BiometricAuthStatus.Unavailable -> {
                 _uiState.value = AuthGateState.Error("Аутентификация не поддерживается на этом устройстве")
             }
-
             is BiometricAuthStatus.WeakBiometricOnly -> {
                 _uiState.value = AuthGateState.Authenticating
                 viewModelScope.launch {
@@ -89,6 +101,7 @@ class AuthGateViewModel @Inject constructor(
 
 sealed interface AuthGateState {
     object Checking : AuthGateState
+    object CheckingAppInstance : AuthGateState
     object RequireAuth : AuthGateState
     object Authenticating : AuthGateState
     object Authenticated : AuthGateState

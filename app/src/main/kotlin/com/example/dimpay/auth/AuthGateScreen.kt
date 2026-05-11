@@ -36,19 +36,14 @@ fun AuthGateScreen(
 ) {
     when (state) {
         is AuthGateState.Checking -> LoadingIndicator()
-        is AuthGateState.RequireAuth -> {
-            LaunchedEffect(Unit) { onAuthenticate() }
-        }
+        is AuthGateState.CheckingAppInstance -> LoadingIndicator()
+        is AuthGateState.RequireAuth -> LaunchedEffect(Unit) { onAuthenticate() }
         is AuthGateState.Authenticating -> LoadingIndicator()
         is AuthGateState.Authenticated -> {
             val appState = rememberAppState()
             App(appState = appState)
         }
-
-        is AuthGateState.SetupRequired -> {
-            SecuritySetupScreen(onSetupClick = onSetupSecurity)
-        }
-
+        is AuthGateState.SetupRequired -> SecuritySetupScreen(onSetupClick = onSetupSecurity)
         is AuthGateState.Error -> ErrorScreen(message = state.message, onRetry = onAuthenticate)
     }
 }

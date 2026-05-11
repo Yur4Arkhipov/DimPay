@@ -48,4 +48,14 @@ dependencies {
     // Dagger Hilt
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
+
+    // Retrofit
+    implementation(libs.retrofit)
+    implementation(libs.retrofit2.converter.gson)
+
+    // Okhttp
+    implementation(libs.okhttp.logging.interceptor)
+
+    //Datastore
+    implementation(libs.androidx.datastore.preferences)
 }
