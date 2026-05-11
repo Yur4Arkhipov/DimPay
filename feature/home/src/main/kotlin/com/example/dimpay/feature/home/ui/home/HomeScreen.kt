@@ -58,7 +58,7 @@ fun HomeScreen(
         ) {
             Column(
                 modifier = Modifier.padding(
-                    horizontal = 20.dp,
+                    horizontal = 16.dp,
                     vertical = 4.dp
                 )
             ) {
@@ -74,8 +74,8 @@ fun HomeScreen(
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(
-                    start = 20.dp,
-                    end = 20.dp,
+                    start = 16.dp,
+                    end = 16.dp,
                     bottom = 120.dp
                 ),
                 verticalArrangement = Arrangement.spacedBy(20.dp)

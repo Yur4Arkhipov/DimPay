@@ -12,6 +12,8 @@ import androidx.fragment.app.FragmentActivity
 import com.example.dimpay.auth.AuthGateScreen
 import com.example.dimpay.auth.AuthGateViewModel
 import com.example.dimpay.core.designsystem.theme.DimPayTheme
+import com.example.dimpay.mainapp.App
+import com.example.dimpay.mainapp.rememberAppState
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -26,14 +28,17 @@ class MainActivity : FragmentActivity() {
             DimPayTheme {
                 val state by viewModel.uiState.collectAsState()
 
-                AuthGateScreen(
-                    state = state,
-                    onAuthenticate = { viewModel.authenticate(this) },
-                    onSetupSecurity = {
-                        val intent = Intent(Settings.ACTION_SECURITY_SETTINGS)
-                        startActivity(intent)
-                    }
-                )
+//                AuthGateScreen(
+//                    state = state,
+//                    onAuthenticate = { viewModel.authenticate(this) },
+//                    onSetupSecurity = {
+//                        val intent = Intent(Settings.ACTION_SECURITY_SETTINGS)
+//                        startActivity(intent)
+//                    }
+//                )
+
+                val appState = rememberAppState()
+                App(appState = appState)
             }
         }
     }
