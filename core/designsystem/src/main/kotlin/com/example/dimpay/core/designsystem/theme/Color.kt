@@ -1,4 +1,4 @@
-package com.example.dimpay.ui.theme
+package com.example.dimpay.core.designsystem.theme
 
 import androidx.compose.ui.graphics.Color
 

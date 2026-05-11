@@ -1,6 +1,5 @@
-package com.example.dimpay.ui.theme
+package com.example.dimpay.core.designsystem.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
