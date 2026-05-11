@@ -4,7 +4,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -25,7 +27,7 @@ fun App(appState: AppState) {
         bottomBar = {
             if (currentTopLevel != null) {
                 NavigationBar(
-                    tonalElevation = 8.dp
+                    modifier = Modifier.height(64.dp)
                 ) {
                     appState.topLevelDestinations.forEach { destination ->
                         NavigationBarItem(
@@ -36,9 +38,11 @@ fun App(appState: AppState) {
                             icon = {
                                 Icon(
                                     painter = painterResource(destination.iconRes),
-                                    contentDescription = destination.iconTextId.toString()
+                                    contentDescription = destination.iconTextId.toString(),
+                                    modifier = Modifier.size(22.dp)
                                 )
                             },
+                            alwaysShowLabel = false
                         )
                     }
                 }
