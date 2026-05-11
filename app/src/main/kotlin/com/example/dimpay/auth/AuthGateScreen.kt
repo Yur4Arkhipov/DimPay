@@ -19,7 +19,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.dimpay.core.designsystem.R
-import com.example.dimpay.mainapp.MainApp
+import com.example.dimpay.mainapp.App
+import com.example.dimpay.mainapp.rememberAppState
 
 @Composable
 fun AuthGateScreen(
@@ -33,7 +34,10 @@ fun AuthGateScreen(
             LaunchedEffect(Unit) { onAuthenticate() }
         }
         is AuthGateState.Authenticating -> { }/*LoadingIndicator()*/
-        is AuthGateState.Authenticated -> MainApp()
+        is AuthGateState.Authenticated -> {
+            val appState = rememberAppState()
+            App(appState = appState)
+        }
 
         is AuthGateState.SetupRequired -> {
             SecuritySetupScreen(onSetupClick = onSetupSecurity)
