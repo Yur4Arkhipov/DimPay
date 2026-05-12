@@ -9,6 +9,8 @@ import com.example.dimpay.core.data.remote.dto.CardDetailsDto
 import com.example.dimpay.core.data.remote.dto.QRRequest
 import com.example.dimpay.core.data.remote.service.CustomerApi
 import com.example.dimpay.core.domain.model.Card
+import com.example.dimpay.core.domain.model.ConfirmationDetails
+import com.example.dimpay.core.domain.model.PaymentSession
 import com.example.dimpay.core.domain.repository.CardRepository
 import com.example.dimpay.core.domain.secure.CardSecureStorage
 import com.example.dimpay.core.domain.secure.SecureAppInstanceStorage
@@ -69,7 +71,7 @@ class CardRepositoryImpl @Inject constructor(
 
     override suspend fun generateQr(
         cardId: String
-    ): Result<String> {
+    ): Result<PaymentSession> {
         return runCatching {
             val cardInstanceId =
                 secureCardStorage.getCardInstance(cardId)
@@ -79,12 +81,30 @@ class CardRepositoryImpl @Inject constructor(
                     cardInstanceId = cardInstanceId
                 )
             )
-            response.response
+            PaymentSession(
+                sessionId = response.response
+            )
         }
     }
 
     override suspend fun deleteCard(cardId: String) {
         dao.deleteCard(cardId)
         secureCardStorage.removeCardInstance(cardId)
+    }
+
+    override suspend fun getConfirmationDetails(
+        sessionId: String
+    ): Result<ConfirmationDetails> {
+        return runCatching {
+            val response = api.getConfirmationDetails(sessionId)
+            if (!response.success) {
+                throw IllegalStateException("Confirmation failed")
+            }
+            ConfirmationDetails(
+                sessionId = response.response.sessionId,
+                merchantName = response.response.merchantName,
+                amount = response.response.amount
+            )
+        }
     }
 }

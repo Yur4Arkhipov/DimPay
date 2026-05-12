@@ -6,6 +6,7 @@ import com.example.dimpay.core.domain.repository.CardRepository
 import com.example.dimpay.feature.home.model.BankCardUi
 import com.example.dimpay.feature.home.model.PaymentDialogState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
@@ -68,11 +69,46 @@ class HomeViewModel @Inject constructor(
             }
 
             repository.generateQr(card.cardId)
-                .onSuccess { qr ->
+                .onSuccess { session ->
                     _paymentDialogState.update {
                         it.copy(
                             isLoading = false,
-                            qrValue = qr
+                            sessionId = session.sessionId,
+                            qrValue = session.sessionId
+                        )
+                    }
+                    startFakeQrFlow(session.sessionId)
+                }
+                .onFailure { error ->
+                    _paymentDialogState.update {
+                        it.copy(
+                            isLoading = false,
+                            error = error.message
+                        )
+                    }
+                }
+        }
+    }
+
+    fun startFakeQrFlow(sessionId: String) {
+        viewModelScope.launch {
+            delay(10_000)
+            onQrScanned(sessionId)
+        }
+    }
+
+    fun onQrScanned(sessionId: String) {
+        viewModelScope.launch {
+            _paymentDialogState.update {
+                it.copy(isLoading = true)
+            }
+            repository.getConfirmationDetails(sessionId)
+                .onSuccess { details ->
+                    _paymentDialogState.update {
+                        it.copy(
+                            isLoading = false,
+                            qrValue = null,
+                            confirmation = details
                         )
                     }
                 }
@@ -86,34 +122,4 @@ class HomeViewModel @Inject constructor(
                 }
         }
     }
-
-
-
-//    private val _cards = MutableStateFlow(
-//        listOf(
-//            BankCardUi(
-//                id = 1,
-//                cardName = "Тинькофф",
-//                cardType = "Дебетовая карта",
-//                lastNumbers = "1234",
-////                icon = AppIcons.Home
-//            ),
-//            BankCardUi(
-//                id = 2,
-//                cardName = "Сбербанк",
-//                cardType = "Дебетовая карта",
-//                lastNumbers = "9101",
-////                icon = Icons.Default.CheckCircle
-//            ),
-//            BankCardUi(
-//                id = 3,
-//                cardName = "Альфа-Банк",
-//                cardType = "Кредитная карта",
-//                lastNumbers = "3456",
-////                icon = Icons.Default.Favorite
-//            )
-//        )
-//    )
-//
-//    val cards = _cards.asStateFlow()
 }

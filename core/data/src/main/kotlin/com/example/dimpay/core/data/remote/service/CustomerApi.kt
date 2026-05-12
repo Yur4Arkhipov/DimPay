@@ -3,10 +3,13 @@ package com.example.dimpay.core.data.remote.service
 import com.example.dimpay.core.data.remote.dto.AddCardRequest
 import com.example.dimpay.core.data.remote.dto.AddCardResponse
 import com.example.dimpay.core.data.remote.dto.AppInstanceDto
+import com.example.dimpay.core.data.remote.dto.ConfirmationDetailsResponse
 import com.example.dimpay.core.data.remote.dto.QRRequest
 import com.example.dimpay.core.data.remote.dto.QRResponse
 import retrofit2.http.Body
+import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.Query
 
 interface CustomerApi {
 
@@ -22,4 +25,9 @@ interface CustomerApi {
     suspend fun generateQR(
         @Body request: QRRequest
     ): QRResponse
+
+    @GET("customer/confirmationdetails")
+    suspend fun getConfirmationDetails(
+        @Query("sessionId") sessionId: String
+    ): ConfirmationDetailsResponse
 }

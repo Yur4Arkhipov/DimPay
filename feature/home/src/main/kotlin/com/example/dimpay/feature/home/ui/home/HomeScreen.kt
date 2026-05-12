@@ -261,6 +261,14 @@ fun HomeScreen(
                             )
                         }
                     }
+                    paymentDialogState.confirmation != null -> {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text("Мерчант: ${paymentDialogState.confirmation?.merchantName}")
+                            Text("Сумма: ${paymentDialogState.confirmation?.amount}")
+                        }
+                    }
                     else -> {
                         Text(text = "Вы хотите оплатить картой " + "\"${card.cardName}\"?")
                     }
