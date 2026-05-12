@@ -1,6 +1,7 @@
 package com.example.dimpay.feature.home.ui.home
 
 import android.graphics.Bitmap
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -53,7 +54,7 @@ import androidx.core.graphics.createBitmap
 @Composable
 fun HomeScreen(
     onNavigateToAddCard: () -> Unit,
-    onNavigateToQr: () -> Unit,
+    onNavigateToQr: (String) -> Unit,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val cards by viewModel.cards.collectAsStateWithLifecycle()
@@ -66,7 +67,8 @@ fun HomeScreen(
         if (paymentDialogState.navigateToOfflineQr) {
             viewModel.closePaymentDialog()
             viewModel.resetOfflineNavigation()
-            onNavigateToQr()
+            Log.d("VMHome", "selectedCard: ${paymentDialogState.card?.cardId}")
+            paymentDialogState.card?.cardId?.let { onNavigateToQr(it) }
         }
     }
 

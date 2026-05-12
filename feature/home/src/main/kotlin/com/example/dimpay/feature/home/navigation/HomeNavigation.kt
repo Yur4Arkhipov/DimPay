@@ -16,8 +16,13 @@ data object HomeRoute
 @Serializable
 data object AddCardRoute
 
+//@Serializable
+//data object QrRoute
+
 @Serializable
-data object QrRoute
+data class QrRoute(
+    val cardId: String
+)
 
 @Serializable
 data object HomeBaseRoute
@@ -26,12 +31,15 @@ fun NavController.navigateToHome(navOptions: NavOptions) = navigate(route = Home
 
 fun NavController.navigateToAddCard() = navigate(route = AddCardRoute)
 
-fun NavController.navigateToQr() = navigate(route = QrRoute)
-
+//fun NavController.navigateToQr() = navigate(route = QrRoute)
+fun NavController.navigateToQr(cardId: String) {
+    navigate(QrRoute(cardId))
+}
 fun NavGraphBuilder.homeSection(
     onBackClick: () -> Unit,
     onNavigateToAddCard: () -> Unit,
-    onNavigateQr: () -> Unit
+//    onNavigateQr: () -> Unit
+    onNavigateQr: (String) -> Unit
 ) {
     navigation<HomeBaseRoute>(startDestination = HomeRoute) {
         composable<HomeRoute> {
@@ -47,8 +55,15 @@ fun NavGraphBuilder.homeSection(
             )
         }
 
-        composable<QrRoute> {
+//        composable<QrRoute> {
+//            QrScreen(
+//                onBackClick = onBackClick
+//            )
+//        }
+        composable<QrRoute> { backStackEntry ->
+            val route = backStackEntry.toRoute<QrRoute>()
             QrScreen(
+                cardId = route.cardId,
                 onBackClick = onBackClick
             )
         }

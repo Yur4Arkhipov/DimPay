@@ -1,5 +1,6 @@
 package com.example.dimpay.core.data.secure
 
+import android.util.Base64
 import com.example.dimpay.core.data.local.dao.PaymentTokenDao
 import com.example.dimpay.core.data.local.entities.EncryptedPaymentTokenEntity
 import com.example.dimpay.core.domain.model.EncryptedPaymentToken
@@ -22,9 +23,15 @@ class SecureTokenStorageImpl(
         cryptoManager.createKeyIfNotExists(KEY_ALIAS)
         dao.deleteForCard(cardId)
         val entities = tokens.map { token ->
+
+            val keyBytes: ByteArray = Base64.decode(
+                token.key,
+                Base64.NO_WRAP
+            )
+
             val encrypted = cryptoManager.encrypt(
                 alias = KEY_ALIAS,
-                data = token.key.toByteArray()
+                data = keyBytes
             )
             EncryptedPaymentTokenEntity(
                 tokenId = token.tokenId,

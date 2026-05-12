@@ -26,8 +26,11 @@ fun AppNavHost(
             onNavigateToAddCard = {
                 navController.navigateToAddCard()
             },
-            onNavigateQr = {
-                navController.navigateToQr()
+//            onNavigateQr = {
+//                navController.navigateToQr()
+//            },
+            onNavigateQr = { cardId ->
+                navController.navigateToQr(cardId)
             },
             onBackClick = navController::popBackStack
         )

@@ -21,6 +21,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -35,8 +36,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 @Composable
 fun QrScreen(
     viewModel: QrScreenViewModel = hiltViewModel(),
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    cardId: String,
 ) {
+    Log.d("VM", "cardId: $cardId")
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val bitmap by viewModel.qrBitmap.collectAsState()
 
@@ -118,7 +121,10 @@ fun QrScreen(
         Button(
             onClick = {
                 Log.d("QR", "Button clicked")
-                viewModel.generateQr(amount = state.value.toDouble())
+                viewModel.generateQr(
+                    cardId = cardId,
+                    amount = state.value.toDouble()
+                )
             },
             modifier = Modifier
                 .fillMaxWidth()

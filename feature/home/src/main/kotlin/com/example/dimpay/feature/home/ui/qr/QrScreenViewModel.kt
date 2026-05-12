@@ -59,7 +59,7 @@ class QrScreenViewModel @Inject constructor(
         }
     }
 
-    fun generateQr(amount: Double) {
+    fun generateQr(cardId: String, amount: Double) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true)
             try {

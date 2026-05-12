@@ -3,11 +3,17 @@ package com.example.dimpay.core.data.usecase
 import android.util.Base64
 import android.util.Log
 import com.example.dimpay.core.data.secure.CryptoManager
+import com.example.dimpay.core.data.secure.CryptoManager.Companion.TRANSFORMATION
+import com.example.dimpay.core.domain.model.EncryptedData
 import com.example.dimpay.core.domain.secure.CardSecureStorage
 import com.example.dimpay.core.domain.secure.SecureTokenStorage
 import java.nio.ByteBuffer
 import javax.inject.Inject
 import java.util.UUID
+import javax.crypto.Cipher
+import javax.crypto.spec.SecretKeySpec
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.toKotlinUuid
 
 class GenerateQrUseCase @Inject constructor(
     private val cryptoManager: CryptoManager,
@@ -23,6 +29,8 @@ class GenerateQrUseCase @Inject constructor(
         val token = secureTokenStorage.getNextToken(cardId)
             ?: throw IllegalStateException("No tokens")
 
+        Log.d("QR", "Token: ${token.tokenId}")
+
         val cardInstance = cardSecureStorage.getCardInstance(cardId)
             ?: throw IllegalStateException("No cardInstance")
 
@@ -32,14 +40,21 @@ class GenerateQrUseCase @Inject constructor(
             putLong(System.currentTimeMillis() / 1000)
         }.array()
 
+        var encryptedEncryptionKey = EncryptedData(token.encryptedKey, token.iv)
+        var decryptedEncryptionKey = cryptoManager.decrypt("card_storage_key", encryptedEncryptionKey)
 
+        val cipher = Cipher.getInstance(TRANSFORMATION)
 
-        val encrypted = cryptoManager.encrypt(
-            alias = "card_storage_key",
-            data = plaintext
+        Log.d("QR", "key: ${decryptedEncryptionKey.toHexString()}")
+
+        cipher.init(
+            Cipher.ENCRYPT_MODE,
+            SecretKeySpec(decryptedEncryptionKey, "AES")
         )
 
-        val finalBytes = token.tokenId.toUuidBytes() + encrypted.iv + encrypted.ciphertext
+        val encryptedBytes = cipher.doFinal(plaintext)
+
+        val finalBytes = token.tokenId.toUuidBytes() + cipher.iv + encryptedBytes
 
         Log.d("QR", "bytes: $finalBytes")
 
@@ -53,12 +68,14 @@ class GenerateQrUseCase @Inject constructor(
     }
 }
 
+@OptIn(ExperimentalUuidApi::class)
 fun uuidStringToBytes(uuidStr: String): ByteArray {
     val uuid = UUID.fromString(uuidStr) // accepts standard form "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-    val bb = ByteBuffer.allocate(16)
-    bb.putLong(uuid.mostSignificantBits)
-    bb.putLong(uuid.leastSignificantBits)
-    return bb.array() // 16 bytes, big-endian (network order)
+    return uuid.toKotlinUuid().toByteArray()
+//    val bb = ByteBuffer.allocate(16)
+//    bb.putLong(uuid.mostSignificantBits)
+//    bb.putLong(uuid.leastSignificantBits)
+//    return bb.array() // 16 bytes, big-endian (network order)
 }
 
 // extension version

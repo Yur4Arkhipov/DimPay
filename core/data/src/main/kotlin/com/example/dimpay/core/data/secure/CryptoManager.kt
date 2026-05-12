@@ -14,7 +14,7 @@ class CryptoManager @Inject constructor() {
 
     companion object {
         private const val ANDROID_KEYSTORE = "AndroidKeyStore"
-        private const val TRANSFORMATION = "AES/GCM/NoPadding"
+        const val TRANSFORMATION = "AES/GCM/NoPadding"
     }
 
     fun createKeyIfNotExists(alias: String) {
