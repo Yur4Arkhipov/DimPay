@@ -6,8 +6,8 @@ import com.example.dimpay.core.domain.model.Card
 
 @Entity(tableName = "card")
 data class CardEntity(
-//    @PrimaryKey(autoGenerate = true) val id: Int = 0,
-    @PrimaryKey val cardId: String,
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    val cardId: String,
     val cardName: String,
 )
 

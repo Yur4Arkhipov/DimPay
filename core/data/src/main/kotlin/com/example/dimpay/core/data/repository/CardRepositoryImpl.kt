@@ -1,10 +1,10 @@
 package com.example.dimpay.core.data.repository
 
+import android.util.Log
 import com.example.dimpay.core.data.local.dao.CardDao
 import com.example.dimpay.core.data.local.entities.CardEntity
 import com.example.dimpay.core.data.local.entities.toDomain
 import com.example.dimpay.core.data.remote.dto.AddCardRequest
-import com.example.dimpay.core.data.remote.dto.AddCardResponse
 import com.example.dimpay.core.data.remote.dto.CardDetailsDto
 import com.example.dimpay.core.data.remote.dto.QRRequest
 import com.example.dimpay.core.data.remote.service.CustomerApi
@@ -51,20 +51,19 @@ class CardRepositoryImpl @Inject constructor(
                 )
             )
         )
-//        delay(1000)
-//        val response = AddCardResponse(
-//            cardId = UUID.randomUUID().toString(),
-//            cardInstance = UUID.randomUUID().toString()
-//        )
+        Log.d("CardRepository", "Card id: $response")
+
+        val cardId = UUID.randomUUID().toString()
+
         dao.insertCard(
             CardEntity(
-                cardId = response.cardId,
+                cardId = cardId,
                 cardName = cardName
             )
         )
         secureCardStorage.saveCardInstance(
-            cardId = response.cardId,
-            cardInstance = response.cardInstance
+            cardId = cardId,
+            cardInstance = response.response
         )
     }
 

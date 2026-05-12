@@ -1,6 +1,6 @@
 package com.example.dimpay.core.data.remote.dto
 
 data class AddCardResponse(
-    val cardId: String,
-    val cardInstance: String
+    val success: Boolean,
+    val response: String
 )

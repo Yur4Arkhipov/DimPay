@@ -23,7 +23,6 @@ object DatabaseModule {
             CardDatabase::class.java,
             "card_db"
         )
-//            .addMigrations(CardDatabase.MIGRATION_1_2, CardDatabase.MIGRATION_2_3)
             .build()
 
     @Provides

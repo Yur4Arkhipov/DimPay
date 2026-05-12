@@ -11,12 +11,4 @@ import com.example.dimpay.core.data.local.entities.CardEntity
 )
 abstract class CardDatabase : RoomDatabase() {
     abstract fun cardDao(): CardDao
-
-//    companion object {
-//        val MIGRATION_1_2 = object : Migration(1, 2) {
-//            override fun migrate(db: SupportSQLiteDatabase) {
-//                db.execSQL("ALTER TABLE meal ADD COLUMN imageUri TEXT")
-//            }
-//        }
-//    }
 }
