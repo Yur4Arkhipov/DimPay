@@ -26,6 +26,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -51,10 +52,14 @@ fun AddCardScreen(
     viewModel: AddCardViewModel = hiltViewModel(),
     onBackClick: () -> Unit
 ) {
-
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
     val focusManager = LocalFocusManager.current
+
+    LaunchedEffect(uiState.isSuccess) {
+        if (uiState.isSuccess) {
+            onBackClick()
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -209,9 +214,8 @@ fun AddCardScreen(
             Spacer(modifier = Modifier.height(40.dp))
 
             Button(
-                onClick = {
-
-                },
+                onClick = { viewModel.addCard() },
+                enabled = uiState.isAddButtonEnabled,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(64.dp),

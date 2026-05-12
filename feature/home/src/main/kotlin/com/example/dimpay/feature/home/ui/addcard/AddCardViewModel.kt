@@ -1,21 +1,57 @@
 package com.example.dimpay.feature.home.ui.addcard
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.dimpay.core.domain.repository.CardRepository
 import com.example.dimpay.feature.home.model.AddCardUi
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
-
 
 @HiltViewModel
 class AddCardViewModel @Inject constructor(
-
+    private val repository: CardRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AddCardUi())
     val uiState = _uiState.asStateFlow()
+
+    fun addCard() {
+        val state = uiState.value
+        viewModelScope.launch {
+            _uiState.update {
+                it.copy(
+                    isLoading = true,
+                    error = null
+                )
+            }
+            runCatching {
+                repository.addCard(
+                    cardName = state.cardName,
+                    cardNumber = state.cardNumber,
+                    expireDate = state.expireDate,
+                    cvv = state.cvv
+                )
+            }.onSuccess {
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        isSuccess = true
+                    )
+                }
+            }.onFailure { error ->
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        error = error.message
+                    )
+                }
+            }
+        }
+    }
 
     fun onCardNameChange(value: String) {
         val formatted = value.replace("\n", "")

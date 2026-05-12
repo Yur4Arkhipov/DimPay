@@ -64,21 +64,49 @@ fun HomeScreen(
                 )
             }
 
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(
-                    start = 16.dp,
-                    end = 16.dp,
-                    bottom = 120.dp
-                ),
-                verticalArrangement = Arrangement.spacedBy(20.dp)
-            ) {
+            if (cards.isEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
 
-                items(
-                    items = cards,
-                    key = { it.id }
-                ) { card ->
-                    BankCardItem(card = card)
+                        Text(
+                            text = "У вас пока нет карт",
+                            style = MaterialTheme.typography.titleLarge.copy(
+                                fontWeight = FontWeight.SemiBold
+                            ),
+                            color = Color(0xFF1A1A3A)
+                        )
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Text(
+                            text = "Добавьте карту для оплаты",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = Color.Gray
+                        )
+                    }
+                }
+            } else {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(
+                        start = 16.dp,
+                        end = 16.dp,
+                        bottom = 120.dp
+                    ),
+                    verticalArrangement = Arrangement.spacedBy(20.dp)
+                ) {
+                    items(
+                        items = cards,
+                        key = { it.cardId }
+                    ) { card ->
+                        BankCardItem(card = card)
+                    }
                 }
             }
         }

@@ -27,6 +27,9 @@ okhttp = "5.3.2"
 
 datastorePreferences = "1.2.1"
 
+room = "2.8.4"
+securityCrypto = "1.1.0"
+
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -68,6 +71,13 @@ okhttp-logging-interceptor = { module = "com.squareup.okhttp3:logging-intercepto
 # Datastore
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
 
+# Room
+room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
+room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
+room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+
+androidx-security-crypto = { module = "androidx.security:security-crypto", version.ref = "securityCrypto" }
+
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
@@ -75,5 +85,5 @@ android-library = { id = "com.android.library", version.ref = "agp" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlinSerialization" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
-#room = { id = "androidx.room", version.ref = "room" }
+room = { id = "androidx.room", version.ref = "room" }
 
