@@ -2,8 +2,10 @@ package com.example.dimpay.core.data.di
 
 import com.example.dimpay.core.data.repository.AppInstanceRepositoryImpl
 import com.example.dimpay.core.data.repository.CardRepositoryImpl
+import com.example.dimpay.core.data.repository.TokenRepositoryImpl
 import com.example.dimpay.core.domain.repository.AppInstanceRepository
 import com.example.dimpay.core.domain.repository.CardRepository
+import com.example.dimpay.core.domain.repository.TokenRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -22,4 +24,9 @@ abstract class RepositoryModule {
     abstract fun bindCardRepository(
         impl: CardRepositoryImpl
     ): CardRepository
+
+    @Binds
+    abstract fun bindTokenRepository(
+        impl: TokenRepositoryImpl
+    ): TokenRepository
 }

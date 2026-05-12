@@ -8,6 +8,8 @@ import com.example.dimpay.core.data.remote.dto.CancelPaymentResponse
 import com.example.dimpay.core.data.remote.dto.ConfirmPaymentRequest
 import com.example.dimpay.core.data.remote.dto.ConfirmPaymentResponse
 import com.example.dimpay.core.data.remote.dto.ConfirmationDetailsResponse
+import com.example.dimpay.core.data.remote.dto.PaymentTokenDto
+import com.example.dimpay.core.data.remote.dto.PaymentTokenResponse
 import com.example.dimpay.core.data.remote.dto.QRRequest
 import com.example.dimpay.core.data.remote.dto.QRResponse
 import retrofit2.Response
@@ -45,4 +47,10 @@ interface CustomerApi {
     suspend fun confirmPayment(
         @Body request: ConfirmPaymentRequest
     ): Response<Unit>
+
+    @GET("customer/tokens")
+    suspend fun getTokens(
+        @Query("cardInstanceId")
+        cardInstance: String
+    ): Response<PaymentTokenResponse>
 }

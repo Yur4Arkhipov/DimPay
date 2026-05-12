@@ -2,11 +2,14 @@ package com.example.dimpay.core.data.di
 
 import android.content.Context
 import com.example.dimpay.core.data.datastore.AppInstanceDataStore
+import com.example.dimpay.core.data.local.dao.PaymentTokenDao
 import com.example.dimpay.core.data.secure.CardSecureStorageImpl
 import com.example.dimpay.core.data.secure.CryptoManager
 import com.example.dimpay.core.data.secure.SecureAppInstanceStorageImpl
+import com.example.dimpay.core.data.secure.SecureTokenStorageImpl
 import com.example.dimpay.core.domain.secure.CardSecureStorage
 import com.example.dimpay.core.domain.secure.SecureAppInstanceStorage
+import com.example.dimpay.core.domain.secure.SecureTokenStorage
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -36,6 +39,18 @@ object SecureStorageModule {
         return SecureAppInstanceStorageImpl(
             dataStore = dataStore,
             cryptoManager = cryptoManager
+        )
+    }
+
+    @Provides
+    @Singleton
+    fun provideSecureTokenStorage(
+        dao: PaymentTokenDao,
+        cryptoManager: CryptoManager
+    ): SecureTokenStorage {
+        return SecureTokenStorageImpl(
+            cryptoManager = cryptoManager,
+            dao = dao
         )
     }
 }

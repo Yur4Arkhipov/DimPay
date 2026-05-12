@@ -46,6 +46,7 @@ fun AuthGateScreen(
         }
         is AuthGateState.SetupRequired -> SecuritySetupScreen(onSetupClick = onSetupSecurity)
         is AuthGateState.Error -> ErrorScreen(message = state.message, onRetry = onStart)
+        is AuthGateState.SyncingTokens -> LoadingIndicator()
     }
 }
 

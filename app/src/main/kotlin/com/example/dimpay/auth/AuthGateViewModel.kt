@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.dimpay.core.data.usecase.SyncPaymentTokensUseCase
 import com.example.dimpay.core.domain.auth.BiometricAuthStatus
 import com.example.dimpay.core.domain.auth.BiometricAuthenticator
 import com.example.dimpay.core.domain.auth.BiometricLockoutException
@@ -21,7 +22,8 @@ import javax.inject.Inject
 class AuthGateViewModel @Inject constructor(
     private val sessionManager: SessionManager,
     private val biometricAuthenticator: BiometricAuthenticator,
-    private val appInstanceRepository: AppInstanceRepository
+    private val appInstanceRepository: AppInstanceRepository,
+    private val syncPaymentTokensUseCase: SyncPaymentTokensUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<AuthGateState>(AuthGateState.Checking)
@@ -42,6 +44,13 @@ class AuthGateViewModel @Inject constructor(
             if (!sessionManager.isAuthenticated()) {
                 _uiState.value = AuthGateState.RequireAuth
                 return@launch
+            }
+            try {
+                _uiState.value = AuthGateState.SyncingTokens
+                syncPaymentTokensUseCase()
+                _uiState.value = AuthGateState.Authenticated
+            } catch (e: Exception) {
+                _uiState.value = AuthGateState.Error(e.message ?: "Ошибка загрузки токенов")
             }
             _uiState.value = AuthGateState.Authenticated
         }
@@ -74,8 +83,19 @@ class AuthGateViewModel @Inject constructor(
 
     private fun handleAuthResult(result: Result<Unit>) {
         if (result.isSuccess) {
-            sessionManager.markAuthenticated()
-            _uiState.value = AuthGateState.Authenticated
+            viewModelScope.launch {
+                try {
+                    sessionManager.markAuthenticated()
+                    _uiState.value = AuthGateState.SyncingTokens
+                    syncPaymentTokensUseCase()
+                    _uiState.value = AuthGateState.Authenticated
+                } catch (e: Exception) {
+                    _uiState.value =
+                        AuthGateState.Error(
+                            e.message ?: "Ошибка загрузки токенов"
+                        )
+                }
+            }
         } else {
             when (result.exceptionOrNull()) {
                 is BiometricUserCanceledException -> {
@@ -106,5 +126,6 @@ sealed interface AuthGateState {
     object Authenticating : AuthGateState
     object Authenticated : AuthGateState
     object SetupRequired : AuthGateState
+    object SyncingTokens : AuthGateState
     data class Error(val message: String) : AuthGateState
 }
