@@ -4,5 +4,5 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class QRRequest(
-    val cardInstance: String
+    val cardInstanceId: String
 )
