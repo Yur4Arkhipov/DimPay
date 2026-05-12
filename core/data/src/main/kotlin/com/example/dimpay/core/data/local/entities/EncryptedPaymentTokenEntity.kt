@@ -6,13 +6,13 @@ import androidx.room.PrimaryKey
 
 @Entity(
     indices = [
-        Index(value = ["cardInstance"])
+        Index(value = ["cardId"])
     ]
 )
 data class EncryptedPaymentTokenEntity(
     @PrimaryKey
     val tokenId: String,
-    val cardInstance: String,
+    val cardId: String,
     val index: Int,
     val encryptedKey: ByteArray,
     val iv: ByteArray

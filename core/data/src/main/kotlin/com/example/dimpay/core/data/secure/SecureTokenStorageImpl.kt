@@ -16,11 +16,11 @@ class SecureTokenStorageImpl(
     }
 
     override suspend fun saveTokens(
-        cardInstance: String,
+        cardId: String,
         tokens: List<PaymentToken>
     ) {
         cryptoManager.createKeyIfNotExists(KEY_ALIAS)
-        dao.deleteForCard(cardInstance)
+        dao.deleteForCard(cardId)
         val entities = tokens.map { token ->
             val encrypted = cryptoManager.encrypt(
                 alias = KEY_ALIAS,
@@ -28,7 +28,7 @@ class SecureTokenStorageImpl(
             )
             EncryptedPaymentTokenEntity(
                 tokenId = token.tokenId,
-                cardInstance = cardInstance,
+                cardId = cardId,
                 index = token.index,
                 encryptedKey = encrypted.ciphertext,
                 iv = encrypted.iv

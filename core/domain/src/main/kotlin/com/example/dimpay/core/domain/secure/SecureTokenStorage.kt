@@ -4,7 +4,7 @@ import com.example.dimpay.core.domain.model.PaymentToken
 
 interface SecureTokenStorage {
     suspend fun saveTokens(
-        cardInstance: String,
+        cardId: String,
         tokens: List<PaymentToken>
     )
     suspend fun getTokens(

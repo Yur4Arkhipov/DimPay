@@ -35,7 +35,10 @@ class SyncPaymentTokensUseCase @Inject constructor(
             Log.d("SyncTokens", "Fetching tokens for card=${card.cardId}")
             val tokens = tokenRepository.getTokens(cardInstance)
             Log.d("SyncTokens", "Received ${tokens.size} tokens for ${card.cardId}")
-            secureStorage.saveTokens(cardInstance, tokens)
+            secureStorage.saveTokens(
+                cardId = card.cardId,
+                tokens = tokens
+            )
             totalSaved += tokens.size
             Log.d(
                 "SyncTokens",

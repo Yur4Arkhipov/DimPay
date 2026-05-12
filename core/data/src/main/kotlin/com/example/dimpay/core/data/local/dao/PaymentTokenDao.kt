@@ -15,18 +15,18 @@ interface PaymentTokenDao {
 
     @Query("""
         SELECT * FROM EncryptedPaymentTokenEntity
-        WHERE cardInstance = :cardInstance
+        WHERE cardId = :cardId
         ORDER BY `index`
     """)
     suspend fun getTokens(
-        cardInstance: String
+        cardId: String
     ): List<EncryptedPaymentTokenEntity>
 
     @Query("""
         DELETE FROM EncryptedPaymentTokenEntity
-        WHERE cardInstance = :cardInstance
+        WHERE cardId = :cardId
     """)
     suspend fun deleteForCard(
-        cardInstance: String
+        cardId: String
     )
 }
