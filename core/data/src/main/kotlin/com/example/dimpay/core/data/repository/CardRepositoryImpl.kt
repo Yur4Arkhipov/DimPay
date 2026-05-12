@@ -5,11 +5,13 @@ import com.example.dimpay.core.data.local.entities.CardEntity
 import com.example.dimpay.core.data.local.entities.toDomain
 import com.example.dimpay.core.data.remote.dto.AddCardRequest
 import com.example.dimpay.core.data.remote.dto.AddCardResponse
+import com.example.dimpay.core.data.remote.dto.CardDetailsDto
 import com.example.dimpay.core.data.remote.dto.QRRequest
 import com.example.dimpay.core.data.remote.service.CustomerApi
 import com.example.dimpay.core.domain.model.Card
 import com.example.dimpay.core.domain.repository.CardRepository
 import com.example.dimpay.core.domain.secure.CardSecureStorage
+import com.example.dimpay.core.domain.secure.SecureAppInstanceStorage
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -19,7 +21,8 @@ import javax.inject.Inject
 class CardRepositoryImpl @Inject constructor(
     private val api: CustomerApi,
     private val dao: CardDao,
-    private val secureStorage: CardSecureStorage
+    private val secureCardStorage: CardSecureStorage,
+    private val secureAppStorage: SecureAppInstanceStorage
 ) : CardRepository {
 
     override fun getCards(): Flow<List<Card>> {
@@ -35,25 +38,31 @@ class CardRepositoryImpl @Inject constructor(
         expireDate: String,
         cvv: String
     ) {
-//        val response = api.addPaymentCard(
-//            AddCardRequest(
-//                cardNumber = cardNumber,
-//                expireDate = expireDate,
-//                cvv = cvv
-//            )
-//        )
-        delay(1000)
-        val response = AddCardResponse(
-            cardId = UUID.randomUUID().toString(),
-            cardInstance = UUID.randomUUID().toString()
+        val appInstanceId = secureAppStorage.getToken()
+            ?: error("AppInstanceId not found")
+
+        val response = api.addPaymentCard(
+            AddCardRequest(
+                appInstanceId = appInstanceId,
+                cardDetails = CardDetailsDto(
+                    cardNumber = cardNumber,
+                    expiryDate = expireDate,
+                    cvv = cvv
+                )
+            )
         )
+//        delay(1000)
+//        val response = AddCardResponse(
+//            cardId = UUID.randomUUID().toString(),
+//            cardInstance = UUID.randomUUID().toString()
+//        )
         dao.insertCard(
             CardEntity(
                 cardId = response.cardId,
                 cardName = cardName
             )
         )
-        secureStorage.saveCardInstance(
+        secureCardStorage.saveCardInstance(
             cardId = response.cardId,
             cardInstance = response.cardInstance
         )
@@ -65,7 +74,7 @@ class CardRepositoryImpl @Inject constructor(
 
         delay(1500)
 
-        val cardInstance = secureStorage.getCardInstance(cardId)
+        val cardInstance = secureCardStorage.getCardInstance(cardId)
                 ?: error("Card instance not found")
 
         return """
@@ -84,6 +93,6 @@ class CardRepositoryImpl @Inject constructor(
 
     override suspend fun deleteCard(cardId: String) {
         dao.deleteCard(cardId)
-        secureStorage.removeCardInstance(cardId)
+        secureCardStorage.removeCardInstance(cardId)
     }
 }

@@ -2,6 +2,7 @@ package com.example.dimpay.feature.home.ui.addcard
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.dimpay.core.designsystem.extensions.formatAsExpireDate
 import com.example.dimpay.core.domain.repository.CardRepository
 import com.example.dimpay.feature.home.model.AddCardUi
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -32,7 +33,7 @@ class AddCardViewModel @Inject constructor(
                 repository.addCard(
                     cardName = state.cardName,
                     cardNumber = state.cardNumber,
-                    expireDate = state.expireDate,
+                    expireDate = state.expireDate.formatAsExpireDate(),
                     cvv = state.cvv
                 )
             }.onSuccess {

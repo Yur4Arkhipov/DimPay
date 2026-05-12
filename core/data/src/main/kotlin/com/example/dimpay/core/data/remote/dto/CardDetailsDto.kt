@@ -3,7 +3,8 @@ package com.example.dimpay.core.data.remote.dto
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class AddCardRequest(
-    val appInstanceId: String,
-    val cardDetails: CardDetailsDto
+data class CardDetailsDto(
+    val cardNumber: String,
+    val expiryDate: String,
+    val cvv: String
 )
