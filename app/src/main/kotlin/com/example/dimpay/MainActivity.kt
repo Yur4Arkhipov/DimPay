@@ -30,6 +30,7 @@ class MainActivity : FragmentActivity() {
 
                 AuthGateScreen(
                     state = state,
+                    onStart = { viewModel.start() },
                     onAuthenticate = { viewModel.authenticate(this) },
                     onSetupSecurity = {
                         val intent = Intent(Settings.ACTION_SECURITY_SETTINGS)

@@ -31,6 +31,7 @@ import com.example.dimpay.mainapp.rememberAppState
 @Composable
 fun AuthGateScreen(
     state: AuthGateState,
+    onStart: () -> Unit,
     onAuthenticate: () -> Unit,
     onSetupSecurity: () -> Unit
 ) {
@@ -44,7 +45,7 @@ fun AuthGateScreen(
             App(appState = appState)
         }
         is AuthGateState.SetupRequired -> SecuritySetupScreen(onSetupClick = onSetupSecurity)
-        is AuthGateState.Error -> ErrorScreen(message = state.message, onRetry = onAuthenticate)
+        is AuthGateState.Error -> ErrorScreen(message = state.message, onRetry = onStart)
     }
 }
 

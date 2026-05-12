@@ -1,45 +1,39 @@
 package com.example.dimpay.core.data.repository
 
+import com.example.dimpay.core.data.datastore.AppInstanceDataStore
+import com.example.dimpay.core.data.remote.service.CustomerApi
 import com.example.dimpay.core.domain.repository.AppInstanceRepository
-import kotlinx.coroutines.delay
 import javax.inject.Inject
 
-class AppInstanceRepositoryImpl @Inject constructor() : AppInstanceRepository {
-
-    private var cachedToken: String? = null
-    var hasInternet: Boolean = false
+class AppInstanceRepositoryImpl @Inject constructor(
+    private val api: CustomerApi,
+    private val dataStore: AppInstanceDataStore
+) : AppInstanceRepository {
 
     override suspend fun getOrFetchToken(): String {
-
-        cachedToken?.let { return it }
-
-        simulateNetworkDelay()
-
-        if (!hasInternet) {
+        val cached = dataStore.getToken()
+        if (cached != null) return cached
+        val response = try {
+            api.setAppInstance()
+        } catch (e: Exception) {
             throw NoInternetException()
         }
-
-        val newToken = generateFakeToken()
-        cachedToken = newToken
-
-        return newToken
+        if (!response.success) {
+            throw AppInstanceException("Server rejected app instance")
+        }
+        val token = response.response
+        dataStore.saveToken(token)
+        return token
     }
 
     override suspend fun hasToken(): Boolean {
-        return cachedToken != null
+        return dataStore.getToken() != null
     }
 
     override suspend fun clearToken() {
-        cachedToken = null
-    }
-
-    private suspend fun simulateNetworkDelay() {
-        delay(800)
-    }
-
-    private fun generateFakeToken(): String {
-        return "app_instance_" + java.util.UUID.randomUUID().toString()
+        dataStore.clear()
     }
 }
 
-class NoInternetException : Exception("No internet connection")
+class NoInternetException : Exception()
+class AppInstanceException(message: String) : Exception(message)
