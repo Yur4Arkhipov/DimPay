@@ -77,49 +77,42 @@ class HomeViewModel @Inject constructor(
                             qrValue = session.sessionId
                         )
                     }
-                    startFakeQrFlow(session.sessionId)
+                    waitForConfirmation(session.sessionId)
                 }
                 .onFailure { error ->
-                    _paymentDialogState.update {
-                        it.copy(
-                            isLoading = false,
-                            error = error.message
-                        )
-                    }
-                }
-        }
-    }
-
-    fun startFakeQrFlow(sessionId: String) {
-        viewModelScope.launch {
-            delay(10_000)
-            onQrScanned(sessionId)
-        }
-    }
-
-    fun onQrScanned(sessionId: String) {
-        viewModelScope.launch {
-            _paymentDialogState.update {
-                it.copy(isLoading = true)
-            }
-            repository.getConfirmationDetails(sessionId)
-                .onSuccess { details ->
                     _paymentDialogState.update {
                         it.copy(
                             isLoading = false,
                             qrValue = null,
-                            confirmation = details
-                        )
-                    }
-                }
-                .onFailure { error ->
-                    _paymentDialogState.update {
-                        it.copy(
-                            isLoading = false,
                             error = error.message
                         )
                     }
                 }
+        }
+    }
+
+    fun waitForConfirmation(sessionId: String) {
+        viewModelScope.launch {
+            repeat(30) { _ ->
+                val result = repository.getConfirmationDetails(sessionId)
+                result.onSuccess { details ->
+                    _paymentDialogState.update {
+                        it.copy(
+                            qrValue = null,
+                            confirmation = details,
+                            error = null
+                        )
+                    }
+                    return@launch
+                }
+                delay(1000)
+            }
+            _paymentDialogState.update {
+                it.copy(
+                    qrValue = null,
+                    error = "Время ожидания истекло"
+                )
+            }
         }
     }
 }

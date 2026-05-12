@@ -17,6 +17,7 @@ import com.example.dimpay.core.domain.secure.SecureAppInstanceStorage
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import retrofit2.HttpException
 import java.util.UUID
 import javax.inject.Inject
 
@@ -95,16 +96,24 @@ class CardRepositoryImpl @Inject constructor(
     override suspend fun getConfirmationDetails(
         sessionId: String
     ): Result<ConfirmationDetails> {
-        return runCatching {
+        try {
+            Log.d("CardRepository", "Before request")
             val response = api.getConfirmationDetails(sessionId)
+            Log.d("CardRepository", "After request")
+            Log.d("CardRepository", "Response: $response")
             if (!response.success) {
                 throw IllegalStateException("Confirmation failed")
             }
-            ConfirmationDetails(
-                sessionId = response.response.sessionId,
-                merchantName = response.response.merchantName,
-                amount = response.response.amount
+            return Result.success(
+                ConfirmationDetails(
+                    sessionId = response.response.sessionId,
+                    merchantName = response.response.merchantName,
+                    amount = response.response.amount
+                )
             )
+        } catch (e: Exception) {
+            Log.e("CardRepository", "Request failed", e)
+            return Result.failure(e)
         }
     }
 }
