@@ -1,6 +1,8 @@
 package com.example.dimpay.feature.home.ui.home.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,6 +21,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -33,6 +36,8 @@ import com.example.dimpay.feature.home.model.BankCardUi
 @Composable
 fun BankCardItem(
     card: BankCardUi,
+    onClick: () -> Unit,
+    onLongClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val cardGradient = Brush.verticalGradient(
@@ -45,7 +50,13 @@ fun BankCardItem(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .height(140.dp),
+            .height(140.dp)
+            .combinedClickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+                onClick = onClick,
+                onLongClick = onLongClick
+            ),
         shape = RoundedCornerShape(32.dp),
         elevation = CardDefaults.cardElevation(
             defaultElevation = 8.dp

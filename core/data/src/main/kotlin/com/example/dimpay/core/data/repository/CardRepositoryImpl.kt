@@ -58,6 +58,11 @@ class CardRepositoryImpl @Inject constructor(
         )
     }
 
+    override suspend fun deleteCard(cardId: String) {
+        dao.deleteCard(cardId)
+        secureStorage.removeCardInstance(cardId)
+    }
+
 //    override suspend fun getCardInstance(
 //        cardId: String
 //    ): String? {

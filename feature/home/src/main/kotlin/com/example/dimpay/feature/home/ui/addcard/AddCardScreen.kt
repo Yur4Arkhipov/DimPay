@@ -20,6 +20,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -224,12 +225,16 @@ fun AddCardScreen(
                     containerColor = Color(0xFF5B3FD8)
                 )
             ) {
-                Text(
-                    text = "Добавить карту",
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontWeight = FontWeight.SemiBold
+                if (uiState.isLoading) {
+                    CircularProgressIndicator()
+                } else {
+                    Text(
+                        text = "Добавить карту",
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = FontWeight.SemiBold
+                        )
                     )
-                )
+                }
             }
 
             Spacer(modifier = Modifier.height(32.dp))

@@ -14,13 +14,18 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -31,6 +36,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.dimpay.core.designsystem.R
 import com.example.dimpay.core.designsystem.theme.bgMainColor
+import com.example.dimpay.feature.home.model.BankCardUi
 import com.example.dimpay.feature.home.ui.home.components.BankCardItem
 
 @Composable
@@ -38,8 +44,9 @@ fun HomeScreen(
     onNavigateToAddCard: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
-
     val cards by viewModel.cards.collectAsStateWithLifecycle()
+    var selectedCard by remember { mutableStateOf<BankCardUi?>(null) }
+    var paymentCard by remember { mutableStateOf<BankCardUi?>(null) }
 
     Box(
         modifier = Modifier
@@ -73,7 +80,6 @@ fun HomeScreen(
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-
                         Text(
                             text = "У вас пока нет карт",
                             style = MaterialTheme.typography.titleLarge.copy(
@@ -105,7 +111,15 @@ fun HomeScreen(
                         items = cards,
                         key = { it.cardId }
                     ) { card ->
-                        BankCardItem(card = card)
+                        BankCardItem(
+                            card = card,
+                            onClick = {
+                                paymentCard = card
+                            },
+                            onLongClick = {
+                                selectedCard = card
+                            }
+                        )
                     }
                 }
             }
@@ -142,5 +156,66 @@ fun HomeScreen(
                 color = Color.White
             )
         }
+    }
+
+    selectedCard?.let { card ->
+        AlertDialog(
+            onDismissRequest = {
+                selectedCard = null
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        viewModel.deleteCard(card.cardId)
+                        selectedCard = null
+                    }
+                ) {
+                    Text("Удалить")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        selectedCard = null
+                    }
+                ) {
+                    Text("Отмена")
+                }
+            },
+            title = { Text("Удалить карту?") },
+            text = { Text("Карта ${card.cardName} будет удалена") }
+        )
+    }
+
+    paymentCard?.let { card ->
+        AlertDialog(
+            onDismissRequest = {
+                paymentCard = null
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        // TODO payment
+
+                        paymentCard = null
+                    }
+                ) {
+                    Text("Оплатить")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        paymentCard = null
+                    }
+                ) {
+                    Text("Отмена")
+                }
+            },
+            title = { Text("Подтверждение оплаты") },
+            text = {
+                Text(text = "Вы хотите оплатить картой \"${card.cardName}\"?")
+            }
+        )
     }
 }
