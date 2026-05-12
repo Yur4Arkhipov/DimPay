@@ -224,7 +224,6 @@ fun HomeScreen(
                     }
                 )
             },
-
             text = {
                 when {
                     paymentDialogState.isLoading -> {
@@ -247,6 +246,20 @@ fun HomeScreen(
                             contentDescription = null,
                             modifier = Modifier.size(260.dp)
                         )
+                    }
+                    paymentDialogState.error != null -> {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = "Ошибка оплаты",
+                                color = Color.Red
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = paymentDialogState.error ?: ""
+                            )
+                        }
                     }
                     else -> {
                         Text(text = "Вы хотите оплатить картой " + "\"${card.cardName}\"?")

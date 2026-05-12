@@ -69,17 +69,18 @@ class CardRepositoryImpl @Inject constructor(
 
     override suspend fun generateQr(
         cardId: String
-    ): String {
-        val cardInstanceId = secureCardStorage.getCardInstance(cardId)
-                ?: error("Card instance not found")
-
-        val response = api.generateQR(
-            QRRequest(
-                cardInstanceId = cardInstanceId
+    ): Result<String> {
+        return runCatching {
+            val cardInstanceId =
+                secureCardStorage.getCardInstance(cardId)
+                    ?: error("Card instance not found")
+            val response = api.generateQR(
+                QRRequest(
+                    cardInstanceId = cardInstanceId
+                )
             )
-        )
-
-        return response.response
+            response.response
+        }
     }
 
     override suspend fun deleteCard(cardId: String) {

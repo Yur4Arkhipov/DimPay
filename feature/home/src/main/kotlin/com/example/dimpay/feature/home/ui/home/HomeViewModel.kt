@@ -62,27 +62,28 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             _paymentDialogState.update {
                 it.copy(
-                    isLoading = true
+                    isLoading = true,
+                    error = null
                 )
             }
 
-            runCatching {
-                repository.generateQr(card.cardId)
-            }.onSuccess { qr ->
-                _paymentDialogState.update {
-                    it.copy(
-                        isLoading = false,
-                        qrValue = qr
-                    )
+            repository.generateQr(card.cardId)
+                .onSuccess { qr ->
+                    _paymentDialogState.update {
+                        it.copy(
+                            isLoading = false,
+                            qrValue = qr
+                        )
+                    }
                 }
-            }.onFailure { error ->
-                _paymentDialogState.update {
-                    it.copy(
-                        isLoading = false,
-                        error = error.message
-                    )
+                .onFailure { error ->
+                    _paymentDialogState.update {
+                        it.copy(
+                            isLoading = false,
+                            error = error.message
+                        )
+                    }
                 }
-            }
         }
     }
 
