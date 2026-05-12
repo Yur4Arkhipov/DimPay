@@ -1,5 +1,10 @@
 package com.example.dimpay.feature.home.ui.home
 
+import android.Manifest
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import androidx.annotation.RequiresPermission
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.dimpay.core.domain.repository.CardRepository
@@ -58,7 +63,7 @@ class HomeViewModel @Inject constructor(
         _paymentDialogState.value = PaymentDialogState()
     }
 
-    fun generateQr() {
+    private fun generateQr() {
         val card = paymentDialogState.value.card ?: return
         viewModelScope.launch {
             _paymentDialogState.update {
@@ -114,5 +119,44 @@ class HomeViewModel @Inject constructor(
                 )
             }
         }
+    }
+
+    @RequiresPermission(Manifest.permission.ACCESS_NETWORK_STATE)
+    fun onPayClick(context: Context) {
+        if (hasInternet(context)) {
+            generateQr()
+        } else {
+            _paymentDialogState.update {
+                it.copy(
+                    navigateToOfflineQr = true
+                )
+            }
+        }
+    }
+
+    fun resetOfflineNavigation() {
+        _paymentDialogState.update {
+            it.copy(
+                navigateToOfflineQr = false
+            )
+        }
+    }
+
+    @RequiresPermission(Manifest.permission.ACCESS_NETWORK_STATE)
+    private fun hasInternet(context: Context): Boolean {
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE)
+                    as ConnectivityManager
+
+        val network = connectivityManager.activeNetwork
+            ?: return false
+
+        val capabilities =
+            connectivityManager.getNetworkCapabilities(network)
+                ?: return false
+
+        return capabilities.hasCapability(
+            NetworkCapabilities.NET_CAPABILITY_INTERNET
+        )
     }
 }
