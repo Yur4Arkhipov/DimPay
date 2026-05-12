@@ -5,6 +5,7 @@ import com.example.dimpay.core.data.local.entities.CardEntity
 import com.example.dimpay.core.data.local.entities.toDomain
 import com.example.dimpay.core.data.remote.dto.AddCardRequest
 import com.example.dimpay.core.data.remote.dto.AddCardResponse
+import com.example.dimpay.core.data.remote.dto.QRRequest
 import com.example.dimpay.core.data.remote.service.CustomerApi
 import com.example.dimpay.core.domain.model.Card
 import com.example.dimpay.core.domain.repository.CardRepository
@@ -58,14 +59,31 @@ class CardRepositoryImpl @Inject constructor(
         )
     }
 
+    override suspend fun generateQr(
+        cardId: String
+    ): String {
+
+        delay(1500)
+
+        val cardInstance = secureStorage.getCardInstance(cardId)
+                ?: error("Card instance not found")
+
+        return """
+            payment://
+            card_instance=$cardInstance
+            timestamp=${System.currentTimeMillis()}
+        """.trimIndent()
+//        val response = api.generateQR(
+//            QRRequest(
+//                cardInstance = cardInstance
+//            )
+//        )
+//
+//        return response.str
+    }
+
     override suspend fun deleteCard(cardId: String) {
         dao.deleteCard(cardId)
         secureStorage.removeCardInstance(cardId)
     }
-
-//    override suspend fun getCardInstance(
-//        cardId: String
-//    ): String? {
-//        return secureStorage.getCardInstance(cardId)
-//    }
 }

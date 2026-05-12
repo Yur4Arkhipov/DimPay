@@ -1,5 +1,7 @@
 package com.example.dimpay.feature.home.ui.home
 
+import android.graphics.Bitmap
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -10,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -17,6 +20,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -29,6 +33,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -38,6 +43,9 @@ import com.example.dimpay.core.designsystem.R
 import com.example.dimpay.core.designsystem.theme.bgMainColor
 import com.example.dimpay.feature.home.model.BankCardUi
 import com.example.dimpay.feature.home.ui.home.components.BankCardItem
+import com.google.zxing.BarcodeFormat
+import com.google.zxing.MultiFormatWriter
+import androidx.core.graphics.createBitmap
 
 @Composable
 fun HomeScreen(
@@ -46,7 +54,7 @@ fun HomeScreen(
 ) {
     val cards by viewModel.cards.collectAsStateWithLifecycle()
     var selectedCard by remember { mutableStateOf<BankCardUi?>(null) }
-    var paymentCard by remember { mutableStateOf<BankCardUi?>(null) }
+    val paymentDialogState by viewModel.paymentDialogState.collectAsStateWithLifecycle()
 
     Box(
         modifier = Modifier
@@ -114,7 +122,7 @@ fun HomeScreen(
                         BankCardItem(
                             card = card,
                             onClick = {
-                                paymentCard = card
+                                viewModel.openPaymentDialog(card)
                             },
                             onLongClick = {
                                 selectedCard = card
@@ -187,35 +195,91 @@ fun HomeScreen(
         )
     }
 
-    paymentCard?.let { card ->
+    paymentDialogState.card?.let { card ->
         AlertDialog(
-            onDismissRequest = {
-                paymentCard = null
-            },
+            onDismissRequest = { viewModel.closePaymentDialog() },
             confirmButton = {
-                TextButton(
-                    onClick = {
-                        // TODO payment
+                if (paymentDialogState.qrValue == null) {
 
-                        paymentCard = null
+                    TextButton(
+                        onClick = {
+                            viewModel.generateQr()
+                        }
+                    ) {
+                        Text("Оплатить")
                     }
-                ) {
-                    Text("Оплатить")
                 }
             },
             dismissButton = {
-                TextButton(
-                    onClick = {
-                        paymentCard = null
-                    }
-                ) {
-                    Text("Отмена")
+                TextButton(onClick = { viewModel.closePaymentDialog() }) {
+                    Text("Закрыть")
                 }
             },
-            title = { Text("Подтверждение оплаты") },
+            title = {
+                Text(
+                    if (paymentDialogState.qrValue == null) {
+                        "Подтверждение оплаты"
+                    } else {
+                        "QR код оплаты"
+                    }
+                )
+            },
+
             text = {
-                Text(text = "Вы хотите оплатить картой \"${card.cardName}\"?")
+                when {
+                    paymentDialogState.isLoading -> {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator()
+                        }
+                    }
+                    paymentDialogState.qrValue != null -> {
+                        val bitmap = remember(
+                                paymentDialogState.qrValue
+                            ) {
+                                generateQrBitmap(paymentDialogState.qrValue ?: "")
+                            }
+                        Image(
+                            bitmap = bitmap.asImageBitmap(),
+                            contentDescription = null,
+                            modifier = Modifier.size(260.dp)
+                        )
+                    }
+                    else -> {
+                        Text(text = "Вы хотите оплатить картой " + "\"${card.cardName}\"?")
+                    }
+                }
             }
         )
+    }
+}
+
+fun generateQrBitmap(
+    text: String,
+    size: Int = 512
+): Bitmap {
+    val bits = MultiFormatWriter().encode(
+        text,
+        BarcodeFormat.QR_CODE,
+        size,
+        size
+    )
+
+    return createBitmap(size, size, Bitmap.Config.RGB_565).apply {
+
+        for (x in 0 until size) {
+            for (y in 0 until size) {
+                setPixel(x, y,
+                    if (bits[x, y]) {
+                        android.graphics.Color.BLACK
+                    } else {
+                        android.graphics.Color.WHITE
+                    }
+                )
+            }
+        }
     }
 }

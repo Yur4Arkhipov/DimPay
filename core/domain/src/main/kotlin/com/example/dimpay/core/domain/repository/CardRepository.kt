@@ -12,8 +12,5 @@ interface CardRepository {
         cvv: String
     )
     suspend fun deleteCard(cardId: String)
-
-//    suspend fun getCardInstance(
-//        cardId: String
-//    ): String?
+    suspend fun generateQr(cardId: String): String
 }
