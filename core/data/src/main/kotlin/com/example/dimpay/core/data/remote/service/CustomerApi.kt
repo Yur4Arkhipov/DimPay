@@ -18,7 +18,7 @@ interface CustomerApi {
         @Body request: AddCardRequest
     ): AddCardResponse
 
-    @POST
+    @POST("customer/onlinepayment")
     suspend fun generateQR(
         @Body request: QRRequest
     ): QRResponse

@@ -1,17 +1,17 @@
 package com.example.dimpay.core.data.repository
 
-import com.example.dimpay.core.data.datastore.AppInstanceDataStore
 import com.example.dimpay.core.data.remote.service.CustomerApi
 import com.example.dimpay.core.domain.repository.AppInstanceRepository
+import com.example.dimpay.core.domain.secure.SecureAppInstanceStorage
 import javax.inject.Inject
 
 class AppInstanceRepositoryImpl @Inject constructor(
     private val api: CustomerApi,
-    private val dataStore: AppInstanceDataStore
+    private val secureStorage: SecureAppInstanceStorage
 ) : AppInstanceRepository {
 
     override suspend fun getOrFetchToken(): String {
-        val cached = dataStore.getToken()
+        val cached = secureStorage.getToken()
         if (cached != null) return cached
         val response = try {
             api.setAppInstance()
@@ -19,19 +19,14 @@ class AppInstanceRepositoryImpl @Inject constructor(
             throw NoInternetException()
         }
         if (!response.success) {
-            throw AppInstanceException("Server rejected app instance")
+            throw AppInstanceException(
+                "Server rejected app instance"
+            )
         }
         val token = response.response
-        dataStore.saveToken(token)
+        secureStorage.saveToken(token)
+
         return token
-    }
-
-    override suspend fun hasToken(): Boolean {
-        return dataStore.getToken() != null
-    }
-
-    override suspend fun clearToken() {
-        dataStore.clear()
     }
 }
 
