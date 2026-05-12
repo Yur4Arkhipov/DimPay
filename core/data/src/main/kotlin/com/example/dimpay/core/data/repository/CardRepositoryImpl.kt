@@ -5,7 +5,9 @@ import com.example.dimpay.core.data.local.dao.CardDao
 import com.example.dimpay.core.data.local.entities.CardEntity
 import com.example.dimpay.core.data.local.entities.toDomain
 import com.example.dimpay.core.data.remote.dto.AddCardRequest
+import com.example.dimpay.core.data.remote.dto.CancelPaymentRequest
 import com.example.dimpay.core.data.remote.dto.CardDetailsDto
+import com.example.dimpay.core.data.remote.dto.ConfirmPaymentRequest
 import com.example.dimpay.core.data.remote.dto.QRRequest
 import com.example.dimpay.core.data.remote.service.CustomerApi
 import com.example.dimpay.core.domain.model.Card
@@ -114,6 +116,37 @@ class CardRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             Log.e("CardRepository", "Request failed", e)
             return Result.failure(e)
+        }
+    }
+
+    override suspend fun cancelPayment(
+        sessionId: String
+    ): Result<Unit> {
+        return runCatching {
+            val response = api.cancelPayment(
+                CancelPaymentRequest(
+                    sessionId = sessionId
+                )
+            )
+
+            if (!response.isSuccessful) {
+                error("Cancel payment failed")
+            }
+        }
+    }
+
+    override suspend fun confirmPayment(
+        sessionId: String
+    ): Result<Unit> {
+        return runCatching {
+            val response = api.confirmPayment(
+                ConfirmPaymentRequest(
+                    sessionId = sessionId
+                )
+            )
+            if (!response.isSuccessful) {
+                error("Confirm failed")
+            }
         }
     }
 }

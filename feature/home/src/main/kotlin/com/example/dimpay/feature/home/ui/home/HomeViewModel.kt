@@ -11,7 +11,9 @@ import com.example.dimpay.core.domain.repository.CardRepository
 import com.example.dimpay.feature.home.model.BankCardUi
 import com.example.dimpay.feature.home.model.PaymentDialogState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
@@ -25,6 +27,8 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val repository: CardRepository
 ) : ViewModel() {
+
+    private var confirmationJob: Job? = null
 
     private val _paymentDialogState = MutableStateFlow(PaymentDialogState())
     val paymentDialogState = _paymentDialogState.asStateFlow()
@@ -97,8 +101,10 @@ class HomeViewModel @Inject constructor(
     }
 
     fun waitForConfirmation(sessionId: String) {
-        viewModelScope.launch {
+        confirmationJob?.cancel()
+        confirmationJob = viewModelScope.launch {
             repeat(30) { _ ->
+                ensureActive()
                 val result = repository.getConfirmationDetails(sessionId)
                 result.onSuccess { details ->
                     _paymentDialogState.update {
@@ -158,5 +164,43 @@ class HomeViewModel @Inject constructor(
         return capabilities.hasCapability(
             NetworkCapabilities.NET_CAPABILITY_INTERNET
         )
+    }
+
+    fun cancelPayment() {
+        val sessionId = paymentDialogState.value.sessionId
+        confirmationJob?.cancel()
+        confirmationJob = null
+        viewModelScope.launch {
+            if (sessionId != null) {
+                repository.cancelPayment(sessionId)
+            }
+            _paymentDialogState.update {
+                it.copy(
+                    qrValue = null,
+                    confirmation = null,
+                    error = null,
+                    sessionId = null,
+                    isLoading = false
+                )
+            }
+            closePaymentDialog()
+        }
+    }
+
+    fun confirmPayment() {
+        val sessionId = paymentDialogState.value.sessionId ?: return
+        viewModelScope.launch {
+            repository.confirmPayment(sessionId)
+                .onSuccess {
+                    closePaymentDialog()
+                }
+                .onFailure { error ->
+                    _paymentDialogState.update {
+                        it.copy(
+                            error = error.message
+                        )
+                    }
+                }
+        }
     }
 }

@@ -213,18 +213,39 @@ fun HomeScreen(
         AlertDialog(
             onDismissRequest = { viewModel.closePaymentDialog() },
             confirmButton = {
-                if (paymentDialogState.qrValue == null) {
-                    TextButton(
-                        onClick =  {
-                            viewModel.onPayClick(context)
+                when {
+                    paymentDialogState.confirmation != null -> {
+                        TextButton(
+                            onClick = {
+                                viewModel.confirmPayment()
+                            }
+                        ) {
+                            Text("Подтвердить")
                         }
-                    ) {
-                        Text("Оплатить")
+                    }
+                    paymentDialogState.qrValue == null -> {
+                        TextButton(
+                            onClick = {
+                                viewModel.onPayClick(context)
+                            }
+                        ) {
+                            Text("Оплатить")
+                        }
                     }
                 }
             },
             dismissButton = {
-                TextButton(onClick = { viewModel.closePaymentDialog() }) {
+                TextButton(
+                    onClick = {
+                        if (
+                            paymentDialogState.qrValue != null ||
+                            paymentDialogState.confirmation != null
+                        ) {
+                            viewModel.cancelPayment()
+                        }
+                        viewModel.closePaymentDialog()
+                    }
+                ) {
                     Text("Закрыть")
                 }
             },

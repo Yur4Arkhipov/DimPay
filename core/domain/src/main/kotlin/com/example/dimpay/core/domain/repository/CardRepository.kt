@@ -18,4 +18,6 @@ interface CardRepository {
     suspend fun getConfirmationDetails(
         sessionId: String
     ): Result<ConfirmationDetails>
+    suspend fun cancelPayment(sessionId: String): Result<Unit>
+    suspend fun confirmPayment(sessionId: String): Result<Unit>
 }
