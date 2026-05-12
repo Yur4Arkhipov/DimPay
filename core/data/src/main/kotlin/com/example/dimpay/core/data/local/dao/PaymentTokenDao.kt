@@ -29,4 +29,20 @@ interface PaymentTokenDao {
     suspend fun deleteForCard(
         cardId: String
     )
+
+    @Query("""
+        DELETE FROM EncryptedPaymentTokenEntity
+        WHERE tokenId = :tokenId
+    """)
+    suspend fun deleteToken(
+        tokenId: String
+    )
+
+    @Query("""
+        SELECT * FROM EncryptedPaymentTokenEntity
+        WHERE cardId = :cardId
+        ORDER BY `index`
+        LIMIT 1
+    """)
+    suspend fun getNextToken(cardId: String): EncryptedPaymentTokenEntity?
 }

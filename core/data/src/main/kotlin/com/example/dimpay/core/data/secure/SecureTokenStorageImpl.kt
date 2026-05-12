@@ -2,7 +2,7 @@ package com.example.dimpay.core.data.secure
 
 import com.example.dimpay.core.data.local.dao.PaymentTokenDao
 import com.example.dimpay.core.data.local.entities.EncryptedPaymentTokenEntity
-import com.example.dimpay.core.domain.model.EncryptedData
+import com.example.dimpay.core.domain.model.EncryptedPaymentToken
 import com.example.dimpay.core.domain.model.PaymentToken
 import com.example.dimpay.core.domain.secure.SecureTokenStorage
 
@@ -36,29 +36,21 @@ class SecureTokenStorageImpl(
         }
         dao.insertAll(entities)
     }
-    override suspend fun getTokens(
-        cardInstance: String
-    ): List<PaymentToken> {
 
-        val entities =
-            dao.getTokens(cardInstance)
+    override suspend fun deleteToken(tokenId: String) {
+        dao.deleteToken(tokenId)
+    }
 
-        return entities.map { entity ->
+    override suspend fun getNextToken(cardId: String): EncryptedPaymentToken? {
+        val entity = dao.getNextToken(cardId)
+            ?: return null
 
-            val decrypted =
-                cryptoManager.decrypt(
-                    alias = KEY_ALIAS,
-                    encryptedData = EncryptedData(
-                        ciphertext = entity.encryptedKey,
-                        iv = entity.iv
-                    )
-                )
-
-            PaymentToken(
-                tokenId = entity.tokenId,
-                index = entity.index,
-                key = decrypted.decodeToString()
-            )
-        }
+        return EncryptedPaymentToken(
+            tokenId = entity.tokenId,
+            cardId = entity.cardId,
+            index = entity.index,
+            encryptedKey = entity.encryptedKey,
+            iv = entity.iv
+        )
     }
 }

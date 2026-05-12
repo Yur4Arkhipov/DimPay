@@ -1,7 +1,6 @@
 package com.example.dimpay.core.data.usecase
 
 import android.util.Log
-import com.example.dimpay.core.domain.model.PaymentToken
 import com.example.dimpay.core.domain.repository.CardRepository
 import com.example.dimpay.core.domain.repository.TokenRepository
 import com.example.dimpay.core.domain.secure.CardSecureStorage
