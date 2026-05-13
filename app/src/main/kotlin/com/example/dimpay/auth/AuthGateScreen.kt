@@ -45,7 +45,11 @@ fun AuthGateScreen(
             App(appState = appState)
         }
         is AuthGateState.SetupRequired -> SecuritySetupScreen(onSetupClick = onSetupSecurity)
-        is AuthGateState.Error -> ErrorScreen(message = state.message, onRetry = onStart)
+//        is AuthGateState.Error -> ErrorScreen(message = state.message, onRetry = onStart)
+        is AuthGateState.Error -> {
+            val appState = rememberAppState()
+            App(appState = appState)
+        }
         is AuthGateState.SyncingTokens -> LoadingIndicator()
     }
 }

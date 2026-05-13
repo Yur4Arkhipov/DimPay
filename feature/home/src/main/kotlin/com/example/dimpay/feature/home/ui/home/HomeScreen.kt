@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,6 +22,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -298,11 +301,37 @@ fun HomeScreen(
                         }
                     }
                     paymentDialogState.confirmation != null -> {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally
+                        Card(
+                            shape = RoundedCornerShape(24.dp),
+                            elevation = CardDefaults.cardElevation(
+                                defaultElevation = 8.dp
+                            ),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+                            ),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 20.dp)
                         ) {
-                            Text("Мерчант: ${paymentDialogState.confirmation?.merchantName}")
-                            Text("Сумма: ${paymentDialogState.confirmation?.amount}")
+
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(24.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                PaymentInfoRow(
+                                    label = "Продавец",
+                                    value = paymentDialogState.confirmation?.merchantName
+                                )
+
+                                Spacer(modifier = Modifier.height(12.dp))
+
+                                PaymentInfoRow(
+                                    label = "Сумма",
+                                    value = "${paymentDialogState.confirmation?.amount} ₽"
+                                )
+                            }
                         }
                     }
                     else -> {
@@ -311,6 +340,32 @@ fun HomeScreen(
                 }
             }
         )
+    }
+}
+
+@Composable
+private fun PaymentInfoRow(
+    label: String,
+    value: String?
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+
+        if (value != null) {
+            Text(
+                text = value,
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.SemiBold
+            )
+        }
     }
 }
 
